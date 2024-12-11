@@ -1,3 +1,4 @@
+import { useState } from "react"
 import CrossIcon from "../icons/CrossIcon"
 import { CartItem, useCartStore } from "../store/cartStore"
 
@@ -6,14 +7,37 @@ const CartItems = () => {
 
     const { removeItem, decrementQuantity, incrementQuantity, cartData, clearCart } = useCartStore((state) => state)
 
+    const [selectedCategory, setSelectedCategory] = useState<string>("")
+
+
+    const categories = [...new Set(cartData.map((item) => item.category))]
+
+    const filteredCartData = cartData.filter((item: CartItem) => {
+        return selectedCategory ? item.category === selectedCategory : true
+    })
+
     return (
         <div className='w-2/3 pr-10'>
             <div className='w-full '>
                 <h2 className='font-titleFont text-2xl'>Shooping Cart</h2>
+                <div className='my-4'>
+                    <select
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className='p-2 border border-gray-300 rounded'
+                    >
+                        <option value="">All Categories</option>
+                        {categories.map((category) => (
+                            <option key={category} value={category}>
+                                {category}
+                            </option>
+                        ))}
+                    </select>
+                </div>
             </div>
             <div>
                 {
-                    cartData?.map((item: CartItem) => (
+                    filteredCartData?.map((item: CartItem) => (
 
                         <div key={item?.id} className='flex items-center justify-between gap-6 mt-6'>
                             <div className='flex items-center gap-2'>
@@ -37,7 +61,7 @@ const CartItems = () => {
                 }
                 <span className="underline text-red-500 cursor-pointer" onClick={() => clearCart()}>Clear Cart ?</span>
                 {
-                    cartData.length === 0 && <div>Nothing in the Cart</div>
+                    filteredCartData.length === 0 && <div>Nothing in the Cart</div>
                 }
             </div>
 
